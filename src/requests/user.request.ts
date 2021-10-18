@@ -1,5 +1,5 @@
 export interface ICreateUserRequest {
   id: number;
-  name: string;
+  firstName: string;
   email: string;
 }

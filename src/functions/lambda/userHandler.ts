@@ -1,11 +1,13 @@
 // import { formatJSONResponse } from "@libs/apiGateway";
+import { USERS_TABLE_NAME } from "@constants/databaseConstants";
 import { middyfy } from "@libs/lambda";
 import { Callback, Context, Handler } from "aws-lambda";
 import * as AWS from "aws-sdk";
-import { USERS_TABLE_NAME } from "src/constants/databaseConstants";
 
 // import { ICreateUserRequest } from "src/requests/user.request";
-const documentClient = new AWS.DynamoDB.DocumentClient({});
+const documentClient = new AWS.DynamoDB.DocumentClient({
+  region: "ap-southeast-1",
+});
 
 /********************************* Create User Function ********************************/
 
@@ -64,7 +66,18 @@ const getAllUsers: Handler = async (
   if (context && event) {
   }
 
-  var result = await scanTable(USERS_TABLE_NAME);
+  const params: any = {
+    TableName: USERS_TABLE_NAME,
+  };
+
+  var result: any = {};
+
+  result = await documentClient
+    .scan(params)
+    .promise()
+    .then((data) => {
+      return data.Items;
+    });
 
   const response = {
     statusCode: 200,
@@ -97,15 +110,11 @@ export const getAllUsersFunction = middyfy(getAllUsers);
 
 /********************************* Update User Function ********************************/
 
-const updateUser: Handler = async (
-  event,
-  context: Context,
-  callback: Callback
-) => {
+const updateUser = async (event, context: Context, callback: Callback) => {
   if (context && event) {
   }
 
-  const body = event.body;
+  const body = JSON.parse(event.body);
 
   var params = {
     TableName: USERS_TABLE_NAME,
@@ -120,29 +129,26 @@ const updateUser: Handler = async (
     ReturnValues: "UPDATED_NEW",
   };
 
-  try {
-    var result = await documentClient.update(params).promise();
+  var response: any = {};
 
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "Data Updated Successfully",
-        result: result,
-      }),
-    };
+  var result: any = {};
 
-    callback(null, response);
-  } catch (error) {
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: "Error",
-        result: error,
-      }),
-    };
+  documentClient.update(params, (error, data) => {
+    if (error) {
+    }
 
-    callback(null, response);
-  }
+    result = data;
+  });
+
+  response = {
+    statusCode: 200,
+    body: JSON.stringify({
+      message: "Data Updated Successfully",
+      result: result,
+    }),
+  };
+
+  callback(null, response);
 };
 
 export const updateUserFunction = middyfy(updateUser);
@@ -166,10 +172,18 @@ const deleteUser: Handler = async (
     },
   };
 
-  try {
-    var result = await documentClient.delete(params).promise();
+  var response: any = {};
 
-    const response = {
+  try {
+    var result: any = {};
+    documentClient.delete(params, (error, data) => {
+      if (error) {
+      }
+
+      result = data;
+    });
+
+    response = {
       statusCode: 200,
       body: JSON.stringify({
         message: "Data Deleted Successfully",
@@ -179,7 +193,7 @@ const deleteUser: Handler = async (
 
     callback(null, response);
   } catch (error) {
-    const response = {
+    response = {
       statusCode: 200,
       body: JSON.stringify({
         message: "Error",

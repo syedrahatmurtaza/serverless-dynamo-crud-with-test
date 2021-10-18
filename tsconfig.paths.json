@@ -5,7 +5,8 @@
       "@functions/*": ["src/functions/lambda*"],
       "@libs/*": ["src/libs/*"],
       "@config/*": ["src/config/*"],
-      "@schema/*": ["src/functions/schema/*"]
+      "@schema/*": ["src/functions/schema/*"],
+      "@constants/*": ["src/constants/*"]
     }
   }
 }
