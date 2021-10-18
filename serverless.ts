@@ -1,8 +1,10 @@
 import { esbuild } from "@config/esbuildConfig";
-// import { dynamoDBRoleStatement } from "@config/roleStatementConfig";
+
 import {
   createUserConfig,
+  deleteUserConfig,
   getAllUsersConfig,
+  updateUserConfig,
   usersTableConfig,
 } from "@config/userConfig";
 
@@ -32,12 +34,22 @@ const serverlessConfiguration: AWS = {
     iamRoleStatements: [
       {
         Effect: "Allow",
-        Action: ["dynamodb:PutItem"],
+        Action: [
+          "dynamodb:PutItem",
+          "dynamodb:Scan",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+        ],
         Resource: "*",
       },
     ],
   },
-  functions: { createUser: createUserConfig, getUsers: getAllUsersConfig },
+  functions: {
+    createUser: createUserConfig,
+    getUsers: getAllUsersConfig,
+    updateUser: updateUserConfig,
+    deleteUser: deleteUserConfig,
+  },
   resources: {
     Resources: {
       usersTable: usersTableConfig,

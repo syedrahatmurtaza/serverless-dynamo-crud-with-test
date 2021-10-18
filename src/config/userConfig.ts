@@ -1,4 +1,8 @@
-import { createUserSchema } from "@schema/userSchema";
+import {
+  createUserSchema,
+  deleteUserSchema,
+  updateUserSchema,
+} from "@schema/userSchema";
 import { USERS_TABLE_NAME } from "src/constants/databaseConstants";
 
 /******************************************************* User Functions Config ******************************************************/
@@ -26,11 +30,40 @@ export const getAllUsersConfig = {
       http: {
         method: "get",
         path: "user/getAll",
-        // request: {
-        //   schema: {
-        //     "application/json": getAllUsersSchema,
-        //   },
-        // },
+      },
+    },
+  ],
+};
+
+export const updateUserConfig = {
+  handler: `src/functions/lambda/userHandler.updateUserFunction`,
+  events: [
+    {
+      http: {
+        method: "patch",
+        path: "user/update",
+        request: {
+          schema: {
+            "application/json": updateUserSchema,
+          },
+        },
+      },
+    },
+  ],
+};
+
+export const deleteUserConfig = {
+  handler: `src/functions/lambda/userHandler.deleteUserFunction`,
+  events: [
+    {
+      http: {
+        method: "delete",
+        path: "user/delete",
+        request: {
+          schema: {
+            "application/json": deleteUserSchema,
+          },
+        },
       },
     },
   ],

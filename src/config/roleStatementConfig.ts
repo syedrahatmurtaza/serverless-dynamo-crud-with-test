@@ -1,5 +1,7 @@
-export const dynamoDBRoleStatement = {
-  Effect: "Allow",
-  Action: ["dynamodb:PutItem", "dynamodb:Scan"],
-  Resource: "*",
-};
+export const dynamoDBRoleStatement = [
+  {
+    Effect: "Allow",
+    Action: ["dynamodb:PutItem", "dynamodb:Scan"],
+    Resource: "*",
+  },
+];
