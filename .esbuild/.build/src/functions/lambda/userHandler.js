@@ -1228,6 +1228,7 @@ var require_http_json_body_parser = __commonJS({
 
 // src/functions/lambda/userHandler.ts
 __export(exports, {
+  create: () => create,
   createUserFunction: () => createUserFunction,
   deleteUserFunction: () => deleteUserFunction,
   getAllUsersFunction: () => getAllUsersFunction,
@@ -1253,38 +1254,31 @@ var documentClient = new AWS.DynamoDB.DocumentClient({
 var create = async (event, context, callback) => {
   if (context) {
   }
-  const body = JSON.parse(event.body);
+  const body = event.body;
   const params = {
     TableName: USERS_TABLE_NAME,
     Item: __spreadValues({}, body),
     ReturnValues: "ALL_OLD"
   };
   var result = {};
-  documentClient.put(params, function(error, data) {
+  result = documentClient.put(params, function(error, result2) {
     if (error) {
-      const response2 = {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: "Error Creating User",
-          result: error
-        })
-      };
-      callback(null, response2);
     }
-    result = data;
+    return result2;
   });
+  if (result) {
+  }
   const response = {
     statusCode: 200,
     body: JSON.stringify({
-      message: "Data Inserted Successfully",
-      result
+      message: "Data Inserted Successfully"
     })
   };
-  callback(null, response);
+  return callback(null, response);
 };
 var createUserFunction = middyfy(create);
 var getAllUsers = async (event, context, callback) => {
-  if (context && event) {
+  if (event && context) {
   }
   const params = {
     TableName: USERS_TABLE_NAME
@@ -1300,7 +1294,7 @@ var getAllUsers = async (event, context, callback) => {
       result
     })
   };
-  callback(null, response);
+  return callback(null, response);
 };
 var scanTable = async (tableName) => {
   const params = {
@@ -1389,6 +1383,7 @@ var deleteUser = async (event, context, callback) => {
 var deleteUserFunction = middyfy(deleteUser);
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  create,
   createUserFunction,
   deleteUserFunction,
   getAllUsersFunction,

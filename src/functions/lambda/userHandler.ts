@@ -11,11 +11,11 @@ const documentClient = new AWS.DynamoDB.DocumentClient({
 
 /********************************* Create User Function ********************************/
 
-const create: Handler = async (event, context: Context, callback: Callback) => {
+export const create = async (event, context: Context, callback: Callback) => {
   if (context) {
   }
 
-  const body = JSON.parse(event.body);
+  const body = event.body;
 
   const params = {
     TableName: USERS_TABLE_NAME,
@@ -27,43 +27,32 @@ const create: Handler = async (event, context: Context, callback: Callback) => {
 
   var result = {};
 
-  documentClient.put(params, function (error, data) {
+  result = documentClient.put(params, function (error, result) {
     if (error) {
-      const response = {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: "Error Creating User",
-          result: error,
-        }),
-      };
-
-      callback(null, response);
     }
-
-    result = data;
+    return result;
   });
+
+  if (result) {
+  }
 
   const response = {
     statusCode: 200,
     body: JSON.stringify({
       message: "Data Inserted Successfully",
-      result: result,
+      // result: result,
     }),
   };
 
-  callback(null, response);
+  return callback(null, response);
 };
 
 export const createUserFunction = middyfy(create);
 
 /********************************* Get ALl Users Function ********************************/
 
-const getAllUsers: Handler = async (
-  event,
-  context: Context,
-  callback: Callback
-) => {
-  if (context && event) {
+const getAllUsers: Handler = async (event, context, callback) => {
+  if (event && context) {
   }
 
   const params: any = {
@@ -87,7 +76,7 @@ const getAllUsers: Handler = async (
     }),
   };
 
-  callback(null, response);
+  return callback(null, response);
 };
 
 export const scanTable = async (tableName) => {
@@ -107,6 +96,7 @@ export const scanTable = async (tableName) => {
 };
 
 export const getAllUsersFunction = middyfy(getAllUsers);
+// export const getAllUsersFunction = getAllUsers;
 
 /********************************* Update User Function ********************************/
 
