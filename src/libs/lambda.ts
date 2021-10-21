@@ -1,6 +1,6 @@
 import middy from "@middy/core";
 import middyJsonBodyParser from "@middy/http-json-body-parser";
-import validator from "@middy/validator";
+// import validator from "@middy/validator";
 
 // import { createUserSchema } from "@schema/userSchema";
 

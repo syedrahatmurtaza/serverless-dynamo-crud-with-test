@@ -1,7 +1,7 @@
 // import { formatJSONResponse } from "@libs/apiGateway";
 import { USERS_TABLE_NAME } from "@constants/databaseConstants";
 import { middyfy } from "@libs/lambda";
-import { Callback, Context, Handler } from "aws-lambda";
+import { Context, Handler } from "aws-lambda";
 import * as AWS from "aws-sdk";
 
 // import { ICreateUserRequest } from "src/requests/user.request";
@@ -11,7 +11,7 @@ const documentClient = new AWS.DynamoDB.DocumentClient({
 
 /********************************* Create User Function ********************************/
 
-export const create = async (event, context: Context, callback: Callback) => {
+export const create = async (event, context) => {
   if (context) {
   }
 
@@ -26,57 +26,71 @@ export const create = async (event, context: Context, callback: Callback) => {
   };
 
   var result = {};
-
-  result = documentClient.put(params, function (error, result) {
-    if (error) {
-    }
-    return result;
-  });
-
   if (result) {
   }
 
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: "Data Inserted Successfully",
-      // result: result,
-    }),
-  };
+  try {
+    result = documentClient.put(params, function (error, result) {
+      if (error) {
+      }
+      return result;
+    });
 
-  return callback(null, response);
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Data Inserted Successfully",
+        // result,
+      }),
+    };
+
+    return response;
+  } catch (error) {
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Data Inserted Successfully",
+        // result,
+      }),
+    };
+
+    return response;
+  }
 };
 
 export const createUserFunction = middyfy(create);
 
 /********************************* Get ALl Users Function ********************************/
 
-const getAllUsers: Handler = async (event, context, callback) => {
+const getAllUsers: Handler = async (event, context) => {
   if (event && context) {
   }
 
-  const params: any = {
-    TableName: USERS_TABLE_NAME,
-  };
-
   var result: any = {};
 
-  result = await documentClient
-    .scan(params)
-    .promise()
-    .then((data) => {
-      return data.Items;
-    });
+  try {
+    result = await scanTable(USERS_TABLE_NAME);
 
-  const response = {
-    statusCode: 200,
-    body: JSON.stringify({
-      message: "Data Scanned Successfully",
-      result: result,
-    }),
-  };
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Data Scanned Successfully",
+        result: result,
+      }),
+    };
 
-  return callback(null, response);
+    return new Promise((resolve) => resolve(response));
+  } catch (error) {
+    const response = {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Error Scanning Data",
+        result: error,
+      }),
+    };
+
+    return new Promise((resolve) => resolve(response));
+  }
 };
 
 export const scanTable = async (tableName) => {
@@ -100,7 +114,7 @@ export const getAllUsersFunction = middyfy(getAllUsers);
 
 /********************************* Update User Function ********************************/
 
-const updateUser = async (event, context: Context, callback: Callback) => {
+const updateUser = async (event, context: Context) => {
   if (context && event) {
   }
 
@@ -138,18 +152,14 @@ const updateUser = async (event, context: Context, callback: Callback) => {
     }),
   };
 
-  callback(null, response);
+  return response;
 };
 
 export const updateUserFunction = middyfy(updateUser);
 
 /********************************* Delete User Function ********************************/
 
-const deleteUser: Handler = async (
-  event,
-  context: Context,
-  callback: Callback
-) => {
+const deleteUser: Handler = async (event, context: Context) => {
   if (context && event) {
   }
 
@@ -181,7 +191,7 @@ const deleteUser: Handler = async (
       }),
     };
 
-    callback(null, response);
+    return response;
   } catch (error) {
     response = {
       statusCode: 200,
@@ -191,7 +201,7 @@ const deleteUser: Handler = async (
       }),
     };
 
-    callback(null, response);
+    return response;
   }
 };
 
